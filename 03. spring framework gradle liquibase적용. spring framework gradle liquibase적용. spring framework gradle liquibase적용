@@ -1,0 +1,44 @@
+단계1 : build.gradle 파일 plugins에 
+	id 'org.liquibase.gradle' version '2.0.2' 추가
+	
+단계2 : build.grade 파일 dependency에
+	implementation 'org.liquibase:liquibase-core:3.8.1'
+    liquibaseRuntime 'org.liquibase:liquibase-core:3.8.1'
+    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:2.0.1'
+    liquibaseRuntime 'org.mariadb.jdbc:mariadb-java-client:2.2.6' 추가
+	
+단계3 : gradle update 실행
+
+참고1 : gradle에서 update해야 
+	DATABASECHAGELOG  |  DATABASECHANGELOGLOCK  테이블 생성됨
+	
+	
+	<sql>
+		CREATE TABLE `admin_hist` (
+		`admin_id` varchar(100) NOT NULL,
+		`mod_dt` datetime NOT NULL,
+		`admin_nm` varchar(20) DEFAULT NULL,
+		`admin_pw` varchar(255) DEFAULT NULL,
+		`status_cd` varchar(20) DEFAULT NULL,
+		`mod_user_id` varchar(100) DEFAULT NULL,
+		PRIMARY KEY (`admin_id`,`mod_dt`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+	</sql>
+	
+	 
+	<changeSet id="release-2.0" author="hyejin.park">
+		<sqlFile dbms="mariadb" encoding="UTF-8"
+		 endDelimiter="\nGO"
+		 path="scripts/create_all.sql"
+		 relativeToChangelogFile="true"
+		 splitStatements="true"
+		 stripComments="true" />
+    </changeSet>
+	
+	<include file="scripts/create_all.sql" relativeToChangelogFile="true"/>
+	
+	<include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+	
+	<include file="config/liquibase/changelog/db-changelog.xml" relativeToChangelogFile="false"/>
+	<include file="/scripts/create_all.sql" relativeToChangelogFile="true"/>
+	
